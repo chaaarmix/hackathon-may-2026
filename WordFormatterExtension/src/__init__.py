@@ -47,7 +47,7 @@ def clean_document(doc):
     - убирает множественные пробелы
     - удаляет пустые абзацы
     """
-    # Сбрасываем прямое форматирование каждого абзаца
+    # Сброс прямого форматирования каждого абзаца
     for para in doc.Paragraphs:
         try:
             para.Range.Font.Reset()
@@ -55,7 +55,7 @@ def clean_document(doc):
         except Exception:
             continue
 
-    # Убираем пробелы в начале и конце каждого абзаца
+    # Удаление пробелов в начале и конце каждого абзаца
     for para in doc.Paragraphs:
         try:
             text = para.Range.Text
@@ -65,7 +65,7 @@ def clean_document(doc):
         except Exception:
             continue
 
-    # Заменяем табуляции на пробелы
+    # Замена табуляции на пробелы
     try:
         word = doc.Application
         word.Selection.Find.ClearFormatting()
@@ -74,7 +74,7 @@ def clean_document(doc):
     except Exception:
         pass
 
-    # Убираем множественные пробелы
+    # Замена множественных пробелов
     try:
         while True:
             word = doc.Application
@@ -98,7 +98,7 @@ def clean_document(doc):
     except Exception:
         pass
 
-    # Удаляем пустые абзацы
+    # Удаление пустых абзацев
     indices_to_delete = []
     for i in range(1, doc.Paragraphs.Count + 1):
         try:
@@ -191,7 +191,6 @@ def replace_placeholders(doc, replacements):
 
     for key, value in replacements.items():
         try:
-            # Используем Selection.Find — работает на живом документе в отличие от doc.Range().Find
             word = doc.Application
             word.Selection.Find.ClearFormatting()
             word.Selection.Find.Replacement.ClearFormatting()
@@ -220,7 +219,6 @@ def format_word_document(input_path, output_path=None, font_name="Calibri", font
     Основная функция форматирования Word-документа.
     Вызывает вспомогательные функции последовательно.
 
-    puzzle_logger_path и **kwargs — служебные параметры Puzzle RPA, не используются напрямую.
     """
     if not input_path:
         raise ValueError("Не указан путь к файлу (input_path)")
@@ -242,7 +240,7 @@ def format_word_document(input_path, output_path=None, font_name="Calibri", font
     doc = None
 
     try:
-        # Запускаем Word — если завис, убиваем процесс и запускаем заново
+        # Запуск Word — если завис, убиваем процесс и запускаем заново
         try:
             word = win32.Dispatch("Word.Application")
             word.Visible = False
@@ -268,7 +266,7 @@ def format_word_document(input_path, output_path=None, font_name="Calibri", font
         format_tables(doc, font_name, font_size)  # 4. Таблицы
         replace_placeholders(doc, replacements)  # 5. Плейсхолдеры
 
-        # Определяем путь для сохранения
+        # Определение пути для сохранения
         if output_path and str(output_path).strip():
             abs_output = os.path.abspath(str(output_path))
             output_dir = os.path.dirname(abs_output)
